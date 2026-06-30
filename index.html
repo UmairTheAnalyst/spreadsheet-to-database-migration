@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital Records Management System (Learning Project)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1917;
+    --ink-2: #3d3b36;
+    --ink-3: #6b6860;
+    --ink-4: #9c9a93;
+    --rule: #e8e5df;
+    --surface: #faf9f6;
+    --white: #ffffff;
+    --fail-bg: #fff5f3;
+    --fail-border: #e87055;
+    --fail-text: #8b3520;
+    --success-bg: #f0f7f2;
+    --success-border: #3a9960;
+    --success-text: #1e5c37;
+    --accent: #c04d2a;
+    --code-bg: #f3f1ec;
+    --blue-bg: #f0f5ff;
+    --blue-border: #4a6fc4;
+    --blue-text: #1e3578;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(250,249,246,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--rule);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; font-weight: 700;
+    color: var(--ink); text-decoration: none;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-brand .pill {
+    background: var(--accent); color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+    padding: 2px 8px; border-radius: 12px; text-transform: uppercase;
+  }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-size: 13px; font-weight: 500; color: var(--ink-3);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-github-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--ink); color: #fff;
+    font-size: 12px; font-weight: 600;
+    padding: 7px 14px; border-radius: 20px;
+    text-decoration: none; transition: opacity 0.2s; flex-shrink: 0;
+  }
+  .nav-github-btn:hover { opacity: 0.85; }
+  .nav-github-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  /* HERO */
+  .hero {
+    max-width: 760px; margin: 0 auto;
+    padding: 80px 2rem 64px;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    line-height: 1.15; font-weight: 700;
+    color: var(--ink); margin-bottom: 20px;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero-sub {
+    font-size: 1.05rem; color: var(--ink-2);
+    max-width: 560px; margin: 0 auto 32px;
+  }
+  .hero-meta {
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  .hero-meta span {
+    font-size: 12px; color: var(--ink-4); font-weight: 500;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .hero-meta span::before {
+    content: ''; width: 6px; height: 6px;
+    border-radius: 50%; background: var(--ink-4);
+  }
+
+  /* SECTION */
+  .section {
+    max-width: 800px; margin: 0 auto; padding: 64px 2rem;
+    border-top: 1px solid var(--rule);
+  }
+  .section-eyebrow {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+  }
+  .section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem; font-weight: 700; margin-bottom: 20px; line-height: 1.25;
+  }
+  .section p { margin-bottom: 16px; color: var(--ink-2); }
+  .section p:last-child { margin-bottom: 0; }
+
+  /* TOOLS ROW */
+  .tools-row {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    align-items: center; gap: 24px; margin: 40px 0;
+  }
+  .tool-card {
+    background: var(--white); border: 1px solid var(--rule);
+    border-radius: 12px; padding: 24px;
+  }
+  .tool-card.excel { border-left: 4px solid var(--fail-border); }
+  .tool-card.access { border-left: 4px solid var(--success-border); }
+  .tool-card .tool-name {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .tool-card.excel .tool-name { color: var(--fail-border); }
+  .tool-card.access .tool-name { color: var(--success-border); }
+  .tool-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+  .tool-card p { font-size: 13px; color: var(--ink-3); margin: 0; }
+  .arrow-block {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .arrow-block .arrow-svg { color: var(--ink-4); }
+  .arrow-block span {
+    font-size: 11px; font-weight: 600; color: var(--ink-4);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  /* ATTEMPT CARDS */
+  .attempt {
+    background: var(--white); border: 1px solid var(--rule);
+    border-radius: 12px; margin-bottom: 24px; overflow: hidden;
+  }
+  .attempt-header {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 20px 24px; border-bottom: 1px solid var(--rule);
+  }
+  .attempt-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--fail-bg); border: 1px solid var(--fail-border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: var(--fail-border);
+    flex-shrink: 0;
+  }
+  .attempt-title { font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
+  .attempt-subtitle { font-size: 13px; color: var(--ink-3); }
+  .attempt-body { padding: 20px 24px; }
+  .attempt-body p { font-size: 14px; color: var(--ink-2); margin-bottom: 14px; }
+
+  /* SCREENSHOT MOCK */
+  .screenshot-mock {
+    background: var(--code-bg); border: 1px solid var(--rule);
+    border-radius: 8px; overflow: hidden; margin: 16px 0;
+  }
+  .screenshot-mock .titlebar {
+    background: var(--rule); padding: 8px 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #ffbd2e; }
+  .dot-g { background: #28ca41; }
+  .titlebar-label {
+    font-size: 11px; color: var(--ink-3); margin-left: 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .screenshot-content { padding: 16px; }
+
+  /* TABLE MOCK */
+  .mock-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 12px; font-family: 'JetBrains Mono', monospace;
+  }
+  .mock-table th {
+    background: var(--rule); padding: 6px 10px;
+    text-align: left; font-weight: 600; color: var(--ink-2);
+    border: 1px solid #d8d5cf;
+  }
+  .mock-table td {
+    padding: 5px 10px; border: 1px solid #e0ddd7; color: var(--ink-2);
+  }
+  .mock-table tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
+  .mock-table .ref-cell { color: #c04d2a; font-weight: 500; }
+  .mock-table .err-cell { color: #d9341c; background: #fff0ed !important; }
+  .mock-table .vlookup-cell { color: #7c5a00; background: #fffae8 !important; font-size: 10px; }
+
+  /* TAGS */
+  .fail-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--fail-bg); border: 1px solid var(--fail-border);
+    color: var(--fail-text); font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px; margin-top: 12px;
+  }
+  .fail-tag::before { content: '✕'; }
+  .success-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--success-bg); border: 1px solid var(--success-border);
+    color: var(--success-text); font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .success-tag::before { content: '✓'; }
+
+  /* ACCESS TABLE CARDS */
+  .access-tables-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px; margin: 24px 0;
+  }
+  .access-table-card {
+    background: var(--white); border: 1px solid var(--rule);
+    border-radius: 10px; overflow: hidden;
+  }
+  .access-table-card .card-head {
+    background: var(--blue-bg); border-bottom: 1px solid var(--blue-border);
+    padding: 8px 12px; font-size: 12px; font-weight: 700; color: var(--blue-text);
+    font-family: 'JetBrains Mono', monospace;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .access-table-card .card-head svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .access-table-card .field {
+    padding: 5px 12px; font-size: 11.5px; color: var(--ink-3);
+    border-bottom: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .access-table-card .field:last-child { border-bottom: none; }
+  .field .pk {
+    color: #c04d2a; font-weight: 700; font-size: 9px;
+    padding: 1px 4px; background: #fff0eb; border-radius: 3px;
+  }
+  .field .fk {
+    color: var(--blue-border); font-weight: 700; font-size: 9px;
+    padding: 1px 4px; background: var(--blue-bg); border-radius: 3px;
+  }
+  .field .type { margin-left: auto; color: var(--ink-4); font-size: 10px; }
+
+  /* RELATIONSHIP DIAGRAM */
+  .rel-diagram-wrap {
+    background: var(--white); border: 1px solid var(--rule);
+    border-radius: 12px; padding: 24px; margin: 24px 0; overflow-x: auto;
+  }
+  .rel-diagram-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--ink-4); margin-bottom: 16px;
+  }
+
+  /* COMPARISON TABLE */
+  .comparison-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+  .comparison-table th {
+    background: var(--ink); color: #fff;
+    padding: 10px 16px; text-align: left;
+    font-size: 13px; font-weight: 600;
+  }
+  .comparison-table th:first-child { border-radius: 8px 0 0 0; }
+  .comparison-table th:last-child { border-radius: 0 8px 0 0; }
+  .comparison-table td {
+    padding: 10px 16px; font-size: 13px; border-bottom: 1px solid var(--rule);
+  }
+  .comparison-table tr:last-child td { border-bottom: none; }
+  .comparison-table tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
+  .comparison-table .good { color: var(--success-text); }
+  .comparison-table .bad { color: var(--fail-text); }
+  .comparison-table .feature-col { font-weight: 500; color: var(--ink-2); }
+
+  /* CALLOUTS */
+  .callout {
+    border-left: 3px solid var(--accent); background: var(--white);
+    padding: 16px 20px; border-radius: 0 8px 8px 0;
+    margin: 24px 0; font-size: 14px; color: var(--ink-2);
+  }
+  .callout strong { color: var(--accent); }
+  .callout-blue {
+    border-left: 3px solid var(--blue-border); background: var(--blue-bg);
+    padding: 16px 20px; border-radius: 0 8px 8px 0;
+    margin: 24px 0; font-size: 14px; color: var(--blue-text);
+  }
+
+  /* CODE */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; background: var(--code-bg);
+    padding: 2px 6px; border-radius: 4px; color: var(--ink-2);
+  }
+
+  /* QUERY BLOCK */
+  .query-block {
+    background: #1a1917; border-radius: 10px;
+    padding: 20px 24px; margin: 20px 0; overflow-x: auto;
+  }
+  .query-block pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; line-height: 1.6; color: #c9c7bf; margin: 0;
+  }
+  .sql-keyword { color: #ff9d6e; }
+  .sql-table   { color: #89cff0; }
+  .sql-field   { color: #b5e8b0; }
+  .sql-comment { color: #6b6860; font-style: italic; }
+
+  /* EXCEL FORMULA SYNTAX HIGHLIGHTING */
+  .xl-func { color: #8fd19e; font-weight: 600; }
+  .xl-ref  { color: #79c0ff; }
+  .xl-str  { color: #f0c987; }
+  .xl-op   { color: #e8e5df; }
+
+  /* FORMULA SCREENSHOTS */
+  .formula-screenshot {
+    margin: 18px 0; border: 1px solid var(--rule); border-radius: 10px;
+    overflow: hidden; background: var(--white);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+  .formula-screenshot img { width: 100%; display: block; }
+  .formula-screenshot .caption {
+    padding: 10px 16px; font-size: 12px; color: var(--ink-3);
+    background: var(--code-bg); border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .formula-screenshot .caption strong { color: var(--ink-2); }
+
+  /* TIMELINE */
+  .timeline { margin: 32px 0; }
+  .timeline-item { display: flex; gap: 20px; margin-bottom: 24px; }
+  .timeline-marker {
+    display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
+  }
+  .timeline-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--white); border: 2px solid var(--ink-4);
+    flex-shrink: 0; margin-top: 5px;
+  }
+  .timeline-dot.fail    { border-color: var(--fail-border); }
+  .timeline-dot.success { border-color: var(--success-border); background: var(--success-border); }
+  .timeline-line { width: 1px; flex: 1; background: var(--rule); margin-top: 4px; }
+  .timeline-content { flex: 1; padding-bottom: 8px; }
+  .timeline-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+  .timeline-label.fail    { color: var(--fail-border); }
+  .timeline-label.success { color: var(--success-border); }
+  .timeline-content h4 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .timeline-content p  { font-size: 13px; color: var(--ink-3); margin: 0; }
+
+  /* GITHUB BUTTON SECTION */
+  .github-section {
+    background: var(--ink); border-radius: 12px;
+    padding: 36px; margin: 40px 0; text-align: center;
+  }
+  .github-section h3 {
+    color: #fff; font-size: 1.2rem; font-weight: 600; margin-bottom: 10px;
+  }
+  .github-section p {
+    color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 24px;
+  }
+  .github-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: #fff; color: var(--ink);
+    font-size: 14px; font-weight: 600;
+    padding: 12px 28px; border-radius: 8px;
+    text-decoration: none; transition: opacity 0.2s;
+  }
+  .github-btn:hover { opacity: 0.88; }
+  .github-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .github-note {
+    margin-top: 16px; font-size: 12px; color: rgba(255,255,255,0.35);
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--rule); text-align: center;
+    padding: 40px 2rem; font-size: 13px; color: var(--ink-4);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .tools-row { grid-template-columns: 1fr; }
+    .arrow-block { transform: rotate(90deg); }
+    nav .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#">
+    Hospital Records Management System
+    <span class="pill">Learning Project</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#excel-attempts">Excel Attempts</a></li>
+    <li><a href="#why-failed">Why was It Unsuccessful</a></li>
+    <li><a href="#access-solution">Access Solution</a></li>
+    <li><a href="#comparison">Comparison</a></li>
+  </ul>
+  <a class="nav-github-btn" href="https://github.com/Umair-Asad2001/Hospital-DBMS-Design-and-Implementation" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.164 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+    View Project Files
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Hospital Records Management System<br><em>From Excel to MS Access</em></h1>
+  <p class="hero-sub">I tried to build a hospital patient records system in Excel, hit a wall, figured out why, then built the right solution in Microsoft Access. This page documents that whole journey.</p>
+  <div class="hero-meta">
+    <span>Data Modeling</span>
+    <span>Relational Database Design</span>
+    <span>SQL Queries in Access</span>
+    <span>Excel-to-Database Migration</span>
+  </div>
+</div>
+
+<!-- THE PROBLEM -->
+<section class="section" id="problem">
+  <p class="section-eyebrow">Where It Started</p>
+  <h2>What I Was Trying to Build</h2>
+  <p>The goal was to build a simple system to manage hospital patient records — things like tracking which patients are admitted, recording doctor visits, calculating bills, and keeping payment status up to date. Think of it like a digital filing system for a small hospital.</p>
+  <p>My first instinct was to use <strong>Microsoft Excel</strong> — it's what I knew best, and it seemed like it could handle tables of data. I gave it a serious try. It didn't work out. This page explains what I tried, why each approach broke down, and how I eventually solved it properly using <strong>Microsoft Access</strong>.</p>
+
+  <p>Looking back, there's actually a second layer to why this got so complicated. I wasn't just trying to <em>store</em> records — I also wanted to <em>analyse</em> them in the same place. Things like a "Summary" sheet showing "Today's Visits" or "This Month's Visits", or status labels like "Active OPD" and "Admitted (IPD)" that update automatically based on the raw data. In simple terms: storing data and analysing data are two different jobs. A spreadsheet is great at the second job, but it isn't built for the first one — safely storing and organising raw records with rules. I was trying to make Excel do both jobs in the same sheets, and every time the "storage" side had even a small inconsistency, the "analysis" formulas built on top of it broke. That's the thread running through both attempts below.</p>
+
+  <div class="tools-row">
+    <div class="tool-card excel">
+      <div class="tool-name">First Attempt</div>
+      <h3>Microsoft Excel</h3>
+      <p>A spreadsheet tool. Great for calculations and simple data. Not designed to manage multiple connected tables of records.</p>
+    </div>
+    <div class="arrow-block">
+      <svg class="arrow-svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <path d="M8 16H24M24 16L18 10M24 16L18 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Moved to</span>
+    </div>
+    <div class="tool-card access">
+      <div class="tool-name">Final Solution</div>
+      <h3>Microsoft Access</h3>
+      <p>A database tool built specifically for storing and linking multiple tables of data with rules that keep everything consistent.</p>
+    </div>
+  </div>
+</section>
+
+<!-- EXCEL ATTEMPTS -->
+<section class="section" id="excel-attempts">
+  <p class="section-eyebrow">Phase 1 — What I Tried in Excel</p>
+  <h2>Two Approaches — Both Unsuccessful</h2>
+  <p>Before switching tools, I genuinely tried to make Excel work. Here are the two different ways I approached it and what went wrong with each one.</p>
+
+  <!-- ATTEMPT 1 -->
+  <div class="attempt">
+    <div class="attempt-header">
+      <div class="attempt-num">1</div>
+      <div>
+        <div class="attempt-title">Putting Everything in One Sheet</div>
+        <div class="attempt-subtitle">One row per patient, all information in one place</div>
+      </div>
+    </div>
+    <div class="attempt-body">
+      <p>My first idea was simple: one big table with everything in it. Each row would be one patient, and the columns would cover their personal details, visit dates, diagnoses, billing amounts, and payment status — all on a single sheet called "Patients Record".</p>
+
+      <div class="screenshot-mock">
+        <div class="titlebar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <span class="titlebar-label">Patients Record — Microsoft Excel</span>
+        </div>
+        <div class="screenshot-content">
+          <div style="overflow-x:auto;">
+            <table class="mock-table">
+              <tr>
+                <th>Patient ID</th><th>Name</th><th>DOB</th><th>Gender</th><th>Blood Group</th>
+                <th>Current Condition</th><th>Condition Change</th><th>Total Amount</th><th>Payment</th>
+              </tr>
+              <tr>
+                <td>P-001</td><td>Name 1</td><td>1943-xx-xx</td><td>Male</td><td>A+</td>
+                <td>Admitted (IPD)</td><td class="ref-cell">—</td><td>21090</td><td>Paid</td>
+              </tr>
+              <tr>
+                <td>P-002</td><td>Name 2</td><td>1977-xx-xx</td><td>Male</td><td>AB+</td>
+                <td>Active OPD</td><td class="ref-cell">—</td><td class="ref-cell">—</td><td class="ref-cell">Active</td>
+              </tr>
+              <tr>
+                <td>P-008</td><td>Name 8</td><td>1975-xx-xx</td><td>Female</td><td>O-</td>
+                <td>Admitted (IPD)</td><td class="ref-cell">OPD → IPD</td><td class="ref-cell">—</td><td class="ref-cell">—</td>
+              </tr>
+              <tr>
+                <td>P-014</td><td>Name 14</td><td>1971-xx-xx</td><td>Male</td><td>A</td>
+                <td>Admitted (IPD)</td><td class="ref-cell">OPD → IPD</td><td class="ref-cell">—</td><td class="ref-cell">—</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <p>The problem showed up quickly. Some patients — like P-008 and P-014 — first visited as outpatients (OPD) and were later admitted as inpatients (IPD). That means they have <em>two separate billing records</em>. But in my table, there was only one row per patient. What do I put in the "Total Amount" column for them? Which bill do I show?</p>
+      <p>The deeper issue is that <strong>one row can only hold one visit</strong>. If a patient comes back three times, do I add three rows? Then I'd have to repeat their name, date of birth, blood group, and address three times — and if any of it changes, I'd have to update every single row manually. It became a mess very fast.</p>
+      <span class="fail-tag">Unsuccessful — One row can't represent multiple visits for the same patient</span>
+    </div>
+  </div>
+
+  <!-- ATTEMPT 2 (MERGED) -->
+  <div class="attempt">
+    <div class="attempt-header">
+      <div class="attempt-num">2</div>
+      <div>
+        <div class="attempt-title">The Excel Formula Approach</div>
+        <div class="attempt-subtitle">Splitting into multiple sheets, connecting them with XLOOKUP, and trying to track patient status and bills with formulas</div>
+      </div>
+    </div>
+    <div class="attempt-body">
+      <p>My second attempt looked smarter: I split the data across different sheets — one for patient details ("Patients Record"), one for OPD billing, one for IPD billing, and one for reference values like ward rates and also converted each sheet into a proper <strong>Excel Table</strong> (using Insert → Table), giving them names like <code>tblPatients</code>, <code>tblOPD</code>, and <code>tblIPD</code>, so I could write cleaner formulas using column names instead of cell references. Then I used Excel's <strong>XLOOKUP formula</strong> to pull patient names from the central patient sheet into the billing sheets automatically, as shown in the following screenshot.</p>
+
+      <div class="formula-screenshot">
+        <img src="OPD Billing - Formula bar of Patient Name column.jpeg" alt="OPD Billing sheet formula bar showing XLOOKUP pulling Patient Name from the Patients Record table">
+        <div class="caption"><strong>OPD Billing sheet</strong> — the "Patient Name" column uses XLOOKUP to fetch the name from "Patients Record" based on Patient ID.</div>
+      </div>
+
+      <p>This part actually worked fine on its own — XLOOKUP successfully pulled names across sheets. But pulling a name is the easy part. What I really wanted was for my "Patients Record" sheet to automatically know <em>where each patient currently stands</em> — were they just registered, currently an OPD patient, or admitted as an IPD patient? So I added a column on Patient Records sheet called <strong>"Current Condition"</strong> with this formula, as shown in the following screenshot:</p>
+
+      <div class="query-block">
+        <pre style="white-space:pre-wrap; word-break:break-word;"><span class="xl-op">=</span><span class="xl-func">IF</span><span class="xl-op">(</span><span class="xl-func">XLOOKUP</span><span class="xl-op">(</span><span class="xl-ref">[@[Patient ID]]</span><span class="xl-op">,</span><span class="xl-ref">tblIPD[Patient id.]</span><span class="xl-op">,</span><span class="xl-ref">tblIPD[Patient id.]</span><span class="xl-op">,</span><span class="xl-str">""</span><span class="xl-op">)&lt;&gt;</span><span class="xl-str">""</span><span class="xl-op">,</span><span class="xl-str">"Admitted (IPD)"</span><span class="xl-op">,</span>
+  <span class="xl-func">IF</span><span class="xl-op">(</span><span class="xl-func">XLOOKUP</span><span class="xl-op">(</span><span class="xl-ref">[@[Patient ID]]</span><span class="xl-op">,</span><span class="xl-ref">tblOPD[Patient id.]</span><span class="xl-op">,</span><span class="xl-ref">tblOPD[Patient id.]</span><span class="xl-op">,</span><span class="xl-str">""</span><span class="xl-op">)&lt;&gt;</span><span class="xl-str">""</span><span class="xl-op">,</span><span class="xl-str">"Active OPD"</span><span class="xl-op">,</span><span class="xl-str">"Registered"</span><span class="xl-op">))</span></pre>
+      </div>
+
+      <div class="formula-screenshot">
+        <img src="Current condition formula in Patient Records sheet.jpeg" alt="Formula bar showing the Current Condition formula in the Patients Record sheet">
+        <div class="caption"><strong>Patients Record sheet</strong> — the "Current Condition" formula checks whether each Patient ID exists in the IPD or OPD tables.</div>
+      </div>
+
+      <p>In plain English, this formula checks: <em>"Does this Patient ID show up anywhere in the IPD table? If yes, this patient is 'Admitted (IPD)'. If not, does it show up in the OPD table? If yes, they're 'Active OPD'. Otherwise, they're just 'Registered'."</em> This is essentially me trying to recreate, with a formula, the kind of status check a database query would do automatically.</p>
+
+      <p>Then I went one step further. Some patients — like P-008 and P-014 — first came in as OPD patients and were <em>later</em> admitted to IPD. That means their Patient ID exists in <strong>both</strong> tables at once. So I added a second column on Patient Records sheet, <strong>"Condition Transition"</strong>, with this formula, as shown in the following screenshot:</p>
+
+      <div class="query-block">
+        <pre style="white-space:pre-wrap; word-break:break-word;"><span class="xl-op">=</span><span class="xl-func">IF</span><span class="xl-op">(</span><span class="xl-func">AND</span><span class="xl-op">(</span><span class="xl-func">XLOOKUP</span><span class="xl-op">(</span><span class="xl-ref">[@[Patient ID]]</span><span class="xl-op">,</span><span class="xl-ref">tblIPD[Patient id.]</span><span class="xl-op">,</span><span class="xl-ref">tblIPD[Patient id.]</span><span class="xl-op">,</span><span class="xl-str">""</span><span class="xl-op">)&lt;&gt;</span><span class="xl-str">""</span><span class="xl-op">,</span>
+       <span class="xl-func">XLOOKUP</span><span class="xl-op">(</span><span class="xl-ref">[@[Patient ID]]</span><span class="xl-op">,</span><span class="xl-ref">tblOPD[Patient id.]</span><span class="xl-op">,</span><span class="xl-ref">tblOPD[Patient id.]</span><span class="xl-op">,</span><span class="xl-str">""</span><span class="xl-op">)&lt;&gt;</span><span class="xl-str">""</span><span class="xl-op">),</span>
+   <span class="xl-str">"OPD → IPD Transition"</span><span class="xl-op">,</span><span class="xl-str">""</span><span class="xl-op">)</span></pre>
+      </div>
+
+      <div class="formula-screenshot">
+        <img src="Condition transition formula in patient records sheet.jpeg" alt="Formula bar showing the Condition Transition formula in the Patients Record sheet">
+        <div class="caption"><strong>Patients Record sheet</strong> — the "Condition Transition" formula flags a patient as "OPD → IPD" when their ID exists in both billing tables.</div>
+      </div>
+
+      <p>This one checks: <em>"Does this Patient ID exist in BOTH the IPD table AND the OPD table? If yes, flag this patient as 'OPD → IPD Transition'."</em> At this point I felt like I was actually building something close to a real status-tracking system — just using formulas instead of a database.</p>
+
+      <p>But then I noticed a problem: even with this flag set on the "Patients Record" sheet, that same patient's <em>old OPD record</em> was still sitting in the OPD Billing sheet, still looking like an active, unresolved OPD visit. So I went into the OPD Billing sheet and added yet another column, "Current Status", with this formula, as shown in the following screenshot:</p>
+
+      <div class="query-block">
+        <pre style="white-space:pre-wrap; word-break:break-word;"><span class="xl-op">=</span><span class="xl-func">IF</span><span class="xl-op">(</span><span class="xl-func">XLOOKUP</span><span class="xl-op">(</span><span class="xl-ref">[@[Patient id.]]</span><span class="xl-op">,</span><span class="xl-ref">tblIPD[Patient id.]</span><span class="xl-op">,</span><span class="xl-ref">tblIPD[Patient id.]</span><span class="xl-op">,</span><span class="xl-str">""</span><span class="xl-op">)&lt;&gt;</span><span class="xl-str">""</span><span class="xl-op">,</span><span class="xl-str">"OPD → IPD Transition"</span><span class="xl-op">,</span><span class="xl-str">"OPD"</span><span class="xl-op">)</span></pre>
+      </div>
+
+      <div class="formula-screenshot">
+        <img src="current status formula in OPD billing sheet.jpeg" alt="Formula bar showing the Current Status formula in the OPD Billing sheet">
+        <div class="caption"><strong>OPD Billing sheet</strong> — the "Current status" formula re-checks the same patient against the IPD table from the OPD side.</div>
+      </div>
+
+      <p>This says: <em>"From the OPD Billing sheet's point of view — does this same patient also show up in the IPD table now? If yes, mark this OPD record as 'OPD → IPD Transition' too. Otherwise, leave it as 'OPD'."</em></p>
+
+      <p>So now I had <strong>three different formulas in three different places</strong>, all trying to answer a version of the same question: "what is this patient's current status?" And that's exactly where it fell apart.</p>
+
+      <span class="fail-tag">Unsuccessful — Status flags updated correctly, but the data sitting next to them didn't follow</span>
+
+      <p style="margin-top:24px;"></p>
+
+      <p>The next thing I tried was about closing the loop: I wanted the "Patients Record" sheet to show, at a glance, how much each patient currently owed — without having to open the billing sheets separately. So I added a "Total Amount" column with this formula, which relies on the "Current Condition" column above, as shown in the following screenshot:</p>
+
+      <div class="query-block">
+        <pre style="white-space:pre-wrap; word-break:break-word;"><span class="xl-op">=</span><span class="xl-func">IFERROR</span><span class="xl-op">(</span>
+  <span class="xl-func">IF</span><span class="xl-op">(</span><span class="xl-ref">[@[Current Condition]]</span><span class="xl-op">=</span><span class="xl-str">"Admitted (IPD)"</span><span class="xl-op">,</span>
+     <span class="xl-func">XLOOKUP</span><span class="xl-op">(</span><span class="xl-ref">[@[Patient ID]]</span><span class="xl-op">,</span><span class="xl-ref">tblIPD[Patient id.]</span><span class="xl-op">,</span><span class="xl-ref">tblIPD[Net amount]</span><span class="xl-op">,</span><span class="xl-str">""</span><span class="xl-op">),</span>
+  <span class="xl-func">IF</span><span class="xl-op">(</span><span class="xl-ref">[@[Current Condition]]</span><span class="xl-op">=</span><span class="xl-str">"Active OPD"</span><span class="xl-op">,</span>
+     <span class="xl-func">XLOOKUP</span><span class="xl-op">(</span><span class="xl-ref">[@[Patient ID]]</span><span class="xl-op">,</span><span class="xl-ref">tblOPD[Patient id.]</span><span class="xl-op">,</span><span class="xl-ref">tblOPD[Net amount]</span><span class="xl-op">,</span><span class="xl-str">""</span><span class="xl-op">),</span>
+     <span class="xl-str">""</span><span class="xl-op">)</span>
+  <span class="xl-op">),</span>
+<span class="xl-str">""</span><span class="xl-op">)</span></pre>
+      </div>
+
+      <div class="formula-screenshot">
+        <img src="Formula for fetching patients total amount from other sheets in Patient Records sheet.jpeg" alt="Formula bar showing the Total Amount formula in the Patients Record sheet">
+        <div class="caption"><strong>Patients Record sheet</strong> — the "Total Amount" formula pulls the Net Amount from either tblIPD or tblOPD depending on Current Condition.</div>
+      </div>
+
+      <p>In plain English: <em>"If this patient's Current Condition is 'Admitted (IPD)', go fetch their Net Amount from the IPD billing table. If it's 'Active OPD' instead, fetch it from the OPD billing table. Otherwise, leave it blank. And if anything at all goes wrong, just show blank instead of an error."</em></p>
+
+      <div class="screenshot-mock">
+        <div class="titlebar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <span class="titlebar-label">Patients Record — Total Amount column</span>
+        </div>
+        <div class="screenshot-content">
+          <div style="overflow-x:auto;">
+            <table class="mock-table">
+              <tr>
+                <th>Patient ID</th><th>Current Condition</th><th>Condition Transition</th><th>Total Amount</th>
+              </tr>
+              <tr>
+                <td>P-002</td><td>Active OPD</td><td>—</td><td>2300</td>
+              </tr>
+              <tr>
+                <td>P-001</td><td>Admitted (IPD)</td><td>—</td><td>21090</td>
+              </tr>
+              <tr>
+                <td>P-008</td><td>Admitted (IPD)</td><td class="ref-cell">OPD → IPD Transition</td><td class="err-cell">(blank)</td>
+              </tr>
+              <tr>
+                <td>P-014</td><td>Admitted (IPD)</td><td class="ref-cell">OPD → IPD Transition</td><td class="err-cell">(blank)</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <p>Here's exactly where it broke. For patients like P-008 and P-014, the "Condition Transition" formula above had already correctly flagged them as <code>"OPD → IPD Transition"</code>. But the "Total Amount" formula only checks for two exact values: <code>"Admitted (IPD)"</code> or <code>"Active OPD"</code>. Their "Current Condition" still technically read "Admitted (IPD)" (because they were now in the IPD table), so the formula <em>did</em> try to pull from <code>tblIPD</code> — but their IPD record was incomplete (still mid-transition), so the lookup returned an error, which <code>IFERROR</code> quietly turned into a blank cell.</p>
+
+      <p>The result: <strong>no error message, no red flag — just an empty cell that looks like the patient simply hasn't been billed yet.</strong> That's arguably worse than a visible error, because nothing tells you to go check.</p>
+
+      <p>And there's a second, deeper issue here, even for patients where the formula <em>did</em> work. If a patient ever has <strong>two active bills at the same time</strong> — one OPD, one IPD — then "the patient's Total Amount" isn't a single number anymore. It's two numbers, for two different visits. The formula can only return one of them, based on whichever condition matches first. So even when it "worked," it was quietly picking one bill and hiding the other.</p>
+
+      <p>This is also a design problem, not just a formula problem. In a relational database, a patient's bill isn't a property <em>of the patient</em> — it's a property <em>of a specific visit or admission</em>. Storing "Total Amount" on the master patient record assumes each patient has exactly one bill at a time. The moment that assumption breaks (as it did for P-008 and P-014), the whole column becomes unreliable. This was the moment I realised: this isn't a formula bug I can patch — it's a structural problem with where I'm storing this information.</p>
+
+      <span class="fail-tag">Unsuccessful — A single "Total Amount" field can't represent a patient with two separate, simultaneous bills</span>
+
+      <p style="margin-top:20px;">At this point I'd tried multiple formula-based approaches within Excel, and every one of them broke down on the same two patients (P-008 and P-014) for slightly different reasons. That's when I started researching properly — and that's how I found out about Database Management Systems, and eventually landed on Microsoft Access.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHY EXCEL FAILED -->
+<section class="section" id="why-failed">
+  <p class="section-eyebrow">The Real Reason</p>
+  <h2>Why Excel Simply Isn't the Right Tool Here</h2>
+  <p>After these attempts, I realised the problem wasn't my Excel skills — it was that I was using the wrong tool entirely. Excel is designed for calculations and analysis on flat data. A <strong>database management system (DBMS)</strong> is designed for storing and managing connected records with rules. These are genuinely different jobs.</p>
+  <p>Here are the specific things I needed that Excel just doesn't have:</p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-marker"><div class="timeline-dot fail"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-label fail">Gap 1</div>
+        <h4>No way to make a Patient ID truly unique</h4>
+        <p>In a real database, you can mark a field as a "Primary Key" — meaning no two rows can ever have the same value there. Excel has no equivalent. You can type the same Patient ID twice and nothing stops you, which leads to confusing duplicate records.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-marker"><div class="timeline-dot fail"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-label fail">Gap 2</div>
+        <h4>No protection against "orphan" records</h4>
+        <p>When I deleted a patient from the patient sheet, their billing rows on other sheets still sat there — now pointing to no one. A real database can say "if this patient is deleted, also delete their billing records (or block the deletion entirely)." Excel has no such rule.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-marker"><div class="timeline-dot fail"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-label fail">Gap 3</div>
+        <h4>XLOOKUP is not the same as a proper table connection</h4>
+        <p>XLOOKUP is more flexible than VLOOKUP, but it has the same fundamental limit: it grabs a snapshot of a value at the moment the formula runs — it doesn't create a live, permanent link between two tables. As soon as a patient existed in both the OPD and IPD tables at once (like P-008 and P-014), my chain of XLOOKUP formulas — "Current Condition", "Condition Transition", "Current Status" — started returning answers that contradicted each other, and the data sitting in nearby columns never updated to match.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-marker"><div class="timeline-dot fail"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-label fail">Gap 4</div>
+        <h4>One patient can't have multiple visits in one row</h4>
+        <p>A hospital patient might visit ten times. In Excel, each visit would need its own row — which means copying the patient's name, age, blood group, and address ten times. If you update their address once, you have to find and fix all ten rows. A database stores the patient details once and links all their visits to that one record.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-marker"><div class="timeline-dot fail"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-label fail">Gap 5</div>
+        <h4>Incomplete records cause cascading errors</h4>
+        <p>Patient P-008 was mid-transition from OPD to IPD — their ward type was blank. In Excel, this caused the entire billing row to show <code>#VALUE!</code> errors, which then broke the totals, which then broke other formulas that depended on those totals. A database either saves a complete record or doesn't save it at all — there's no "half-saved" broken state.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-marker"><div class="timeline-dot fail"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-label fail">Gap 6</div>
+        <h4>Calculated totals don't belong on the master record</h4>
+        <p>My "Total Amount" column tried to store a single bill total directly on each patient's master record. But a bill belongs to a specific visit or admission — not to the patient as a whole. The moment a patient had two active bills at once, "the patient's Total Amount" stopped being a meaningful question. A database keeps facts about the patient (name, DOB, blood group) separate from facts about their visits and bills, and calculates totals on demand instead of storing them.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-marker"><div class="timeline-dot success"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-label success">The Fix</div>
+        <h4>Switched to Microsoft Access</h4>
+        <p>Access is a proper database tool. It handles all six of the above as built-in features — unique IDs, linked tables, protection against missing references, one-to-many relationships, data validation, and calculated fields that live in queries instead of master tables. Once I moved there, all the problems that seemed hard in Excel just... didn't exist.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACCESS SOLUTION -->
+<section class="section" id="access-solution">
+  <p class="section-eyebrow">Phase 2 — The Right Approach</p>
+  <h2>How I Built It in MS Access</h2>
+  <p>In Access, instead of one big spreadsheet, I split the data into separate <strong>tables</strong> — each one storing one type of information. Then I drew connections between them so Access knows how they relate to each other. This is called a <strong>relational database</strong>.</p>
+  <p>Think of it like this: instead of writing a patient's name on every bill, you write their Patient ID — and Access knows to look up the name from the patient table automatically. Change the name once in one place, and it updates everywhere.</p>
+
+  <div class="callout-blue">
+    This directly fixes the problems from my Excel formula approach. Notice that <strong>Name</strong> only appears in the "Patients Record" table below — not in "OPD Visits" or "IPD Admissions". Each table only stores the Patient ID (a foreign key), and the name is fetched automatically through that link whenever it's needed. Similarly, <strong>Age</strong> isn't stored anywhere — it's calculated from the patient's date of birth whenever a query needs it, and <strong>No# of days</strong> for an IPD stay is calculated from the admission and discharge dates.
+  </div>
+
+  <div class="access-tables-grid">
+
+    <div class="access-table-card">
+      <div class="card-head">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="#1e3578" stroke-width="1.2"/><line x1="1" y1="7" x2="15" y2="7" stroke="#1e3578" stroke-width="0.8"/><line x1="5" y1="3" x2="5" y2="13" stroke="#1e3578" stroke-width="0.8"/></svg>
+        Patients Record
+      </div>
+      <div class="field"><span class="pk">PK</span> Patient ID <span class="type">Text</span></div>
+      <div class="field">Name <span class="type">Text</span></div>
+      <div class="field">DOB <span class="type">Date</span></div>
+      <div class="field">Gender <span class="type">Text</span></div>
+      <div class="field">Registration Date <span class="type">Date</span></div>
+      <div class="field">Mobile No <span class="type">Text</span></div>
+      <div class="field">Alternate Mobile No <span class="type">Text</span></div>
+      <div class="field">Address <span class="type">Text</span></div>
+      <div class="field">Blood Group <span class="type">Text</span></div>
+      <div class="field">Status <span class="type">Text</span></div>
+    </div>
+
+    <div class="access-table-card">
+      <div class="card-head">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="#1e3578" stroke-width="1.2"/><line x1="1" y1="7" x2="15" y2="7" stroke="#1e3578" stroke-width="0.8"/><line x1="5" y1="3" x2="5" y2="13" stroke="#1e3578" stroke-width="0.8"/></svg>
+        OPD Visits
+      </div>
+      <div class="field"><span class="pk">PK</span> OPD Visit ID <span class="type">Auto</span></div>
+      <div class="field"><span class="fk">FK</span> Patient ID <span class="type">Text</span></div>
+      <div class="field">Visit Date <span class="type">Date</span></div>
+      <div class="field"><span class="fk">FK</span> Bill Type ID <span class="type">Number</span></div>
+      <div class="field">Bill type <span class="type">Text</span></div>
+      <div class="field">Quantity <span class="type">Number</span></div>
+      <div class="field">Status <span class="type">Text</span></div>
+      <div class="field">Payment Method <span class="type">Text</span></div>
+      <div class="field">Payment date <span class="type">Date</span></div>
+      <div class="field">Remarks <span class="type">Memo</span></div>
+    </div>
+
+    <div class="access-table-card">
+      <div class="card-head">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="#1e3578" stroke-width="1.2"/><line x1="1" y1="7" x2="15" y2="7" stroke="#1e3578" stroke-width="0.8"/><line x1="5" y1="3" x2="5" y2="13" stroke="#1e3578" stroke-width="0.8"/></svg>
+        IPD Admissions
+      </div>
+      <div class="field"><span class="pk">PK</span> Admission ID <span class="type">Auto</span></div>
+      <div class="field"><span class="fk">FK</span> Patient ID <span class="type">Text</span></div>
+      <div class="field"><span class="fk">FK</span> Ward ID <span class="type">Number</span></div>
+      <div class="field">Ward Name <span class="type">Text</span></div>
+      <div class="field">Bed No# <span class="type">Number</span></div>
+      <div class="field">Admission date <span class="type">Date</span></div>
+      <div class="field">Discharge date <span class="type">Date</span></div>
+      <div class="field">Status <span class="type">Text</span></div>
+      <div class="field">Payment Method <span class="type">Text</span></div>
+      <div class="field">Payment date <span class="type">Date</span></div>
+      <div class="field">Remarks <span class="type">Memo</span></div>
+    </div>
+
+    <div class="access-table-card">
+      <div class="card-head">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="#1e3578" stroke-width="1.2"/><line x1="1" y1="7" x2="15" y2="7" stroke="#1e3578" stroke-width="0.8"/><line x1="5" y1="3" x2="5" y2="13" stroke="#1e3578" stroke-width="0.8"/></svg>
+        IPD Rates
+      </div>
+      <div class="field"><span class="pk">PK</span> Ward ID <span class="type">Auto</span></div>
+      <div class="field">Ward Name <span class="type">Text</span></div>
+      <div class="field">Ward Rate per day <span class="type">Currency</span></div>
+      <div class="field">Room Charges <span class="type">Currency</span></div>
+      <div class="field">Nursing Charges <span class="type">Currency</span></div>
+      <div class="field">Discount Rate <span class="type">Number</span></div>
+      <div class="field">Doctor Charges <span class="type">Currency</span></div>
+    </div>
+
+    <div class="access-table-card">
+      <div class="card-head">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="#1e3578" stroke-width="1.2"/><line x1="1" y1="7" x2="15" y2="7" stroke="#1e3578" stroke-width="0.8"/><line x1="5" y1="3" x2="5" y2="13" stroke="#1e3578" stroke-width="0.8"/></svg>
+        OPD Rates
+      </div>
+      <div class="field"><span class="pk">PK</span> Bill Type ID <span class="type">Auto</span></div>
+      <div class="field">Bill Type Name <span class="type">Text</span></div>
+      <div class="field">Rate <span class="type">Currency</span></div>
+      <div class="field">IsQuantityBased <span class="type">Yes/No</span></div>
+      <div class="field">Discount Rate <span class="type">Number</span></div>
+    </div>
+
+  </div>
+
+  <p style="font-size:13px; color:var(--ink-3); margin-top:4px;">
+    <span style="background:var(--fail-bg); color:var(--fail-text); font-size:10px; font-weight:700; padding:2px 6px; border-radius:3px; margin-right:6px;">PK</span> Primary Key — the unique ID for each row in this table &nbsp;&nbsp;
+    <span style="background:var(--blue-bg); color:var(--blue-text); font-size:10px; font-weight:700; padding:2px 6px; border-radius:3px; margin-right:6px;">FK</span> Foreign Key — links this table to another table
+  </p>
+
+  <h3 style="font-size:1.1rem; font-weight:600; margin:32px 0 12px;">How the Tables Are Connected</h3>
+  <p>The diagram below is the actual "Relationships" window from my Access database. Each line is a real, enforced connection — the "1" end is the table that holds the master record, and the "∞" end is the table that can have many matching rows. For example, one patient (1) can have many OPD visits (∞), but each OPD visit belongs to exactly one patient.</p>
+
+  <div class="rel-diagram-wrap">
+    <div class="rel-diagram-title">Table Relationships — Hospital DBMS</div>
+    <img src="Microsoft Access Relationships between tables.jpeg" alt="Microsoft Access Relationships window showing Patients Record, IPD Admissions, OPD Visits, IPD Rates, and OPD Rates tables connected by Patient ID, Ward ID, and Bill Type ID" style="width:100%; border-radius:6px; display:block;">
+  </div>
+
+  <p>Four connections, each enforced by Access: a patient (1) can have many IPD admissions and many OPD visits (∞); a ward type in IPD Rates (1) can apply to many IPD admissions (∞); and a bill type in OPD Rates (1) can apply to many OPD visits (∞). None of these connections existed in Excel — they were just hopeful XLOOKUP formulas pointing in roughly the right direction.</p>
+
+  <h3 style="font-size:1.1rem; font-weight:600; margin:32px 0 12px;">Queries That Replace Broken Formulas</h3>
+  <p>This is really the heart of the difference between Excel and Access. In Excel, I was trying to keep <em>everything</em> in one place — a patient's basic details, their current condition, and their bill total, all in the same "Patients Record" table, using formulas like the ones in Attempts 2 and 3. In Access, the "Patients Record" table only stores facts that genuinely belong to the patient (name, date of birth, gender, address...). Nothing about visits, admissions, or money lives there.</p>
+  <p>Instead, all of that — ages, stay durations, rates, totals, discounts — is calculated on the fly by a <strong>query</strong>, which is just a saved question you ask the database. Here's the actual query I built for IPD billing:</p>
+
+  <div class="query-block">
+    <pre><span class="sql-keyword">SELECT</span>
+  <span class="sql-table">[Patients Record]</span>.<span class="sql-field">[Patient ID]</span>, <span class="sql-table">[Patients Record]</span>.<span class="sql-field">Name</span>,
+  <span class="sql-table">[IPD Admissions]</span>.<span class="sql-field">[Admission ID]</span>, <span class="sql-table">[Patients Record]</span>.<span class="sql-field">DOB</span>,
+  <span class="sql-comment">-- Age is calculated here, never stored</span>
+  <span class="sql-keyword">DateDiff</span>(<span class="sql-field">"yyyy"</span>,[<span class="sql-field">DOB</span>],<span class="sql-keyword">Date</span>())
+    -<span class="sql-keyword">IIf</span>(<span class="sql-keyword">Format</span>([<span class="sql-field">DOB</span>],<span class="sql-field">"mmdd"</span>)&gt;<span class="sql-keyword">Format</span>(<span class="sql-keyword">Date</span>(),<span class="sql-field">"mmdd"</span>),1,0) <span class="sql-keyword">AS</span> <span class="sql-field">Age</span>,
+  <span class="sql-table">[Patients Record]</span>.<span class="sql-field">Gender</span>, <span class="sql-table">[Patients Record]</span>.<span class="sql-field">[Mobile No]</span>,
+  <span class="sql-table">[IPD Admissions]</span>.<span class="sql-field">[Ward ID]</span>, <span class="sql-table">[IPD Admissions]</span>.<span class="sql-field">[Ward Name]</span>,
+  <span class="sql-table">[IPD Admissions]</span>.<span class="sql-field">[Bed No#]</span>,
+  <span class="sql-table">[IPD Admissions]</span>.<span class="sql-field">[Admission date]</span>, <span class="sql-table">[IPD Admissions]</span>.<span class="sql-field">[Discharge date]</span>,
+  <span class="sql-comment">-- Number of days is calculated here, never stored</span>
+  [<span class="sql-field">Discharge date</span>]-[<span class="sql-field">Admission date</span>]+1 <span class="sql-keyword">AS</span> <span class="sql-field">[No# of days]</span>,
+  <span class="sql-table">[IPD Rates]</span>.<span class="sql-field">[Ward Rate per day]</span>, <span class="sql-table">[IPD Rates]</span>.<span class="sql-field">[Room Charges]</span>,
+  <span class="sql-table">[IPD Rates]</span>.<span class="sql-field">[Nursing Charges]</span>, <span class="sql-table">[IPD Rates]</span>.<span class="sql-field">[Doctor Charges]</span>,
+  <span class="sql-comment">-- Total Amount is calculated here — the exact thing my Excel formula approach tried to store on the patient record</span>
+  ([<span class="sql-field">Ward Rate per day</span>]*[<span class="sql-field">No# of days</span>])+([<span class="sql-field">Room Charges</span>]*[<span class="sql-field">No# of days</span>])
+    +([<span class="sql-field">Nursing Charges</span>]*[<span class="sql-field">No# of days</span>])+([<span class="sql-field">Doctor Charges</span>]*[<span class="sql-field">No# of days</span>]) <span class="sql-keyword">AS</span> <span class="sql-field">[Total Amount]</span>,
+  <span class="sql-table">[IPD Rates]</span>.<span class="sql-field">[Discount Rate]</span>,
+  [<span class="sql-field">Total Amount</span>]*[<span class="sql-field">Discount Rate</span>] <span class="sql-keyword">AS</span> <span class="sql-field">[Discount Amount]</span>,
+  [<span class="sql-field">Total Amount</span>]-[<span class="sql-field">Discount Amount</span>] <span class="sql-keyword">AS</span> <span class="sql-field">[Net Amount]</span>,
+  <span class="sql-table">[IPD Admissions]</span>.<span class="sql-field">Status</span>, <span class="sql-table">[IPD Admissions]</span>.<span class="sql-field">[Payment Method]</span>, <span class="sql-table">[IPD Admissions]</span>.<span class="sql-field">[Payment date]</span>
+<span class="sql-keyword">FROM</span> <span class="sql-table">[Patients Record]</span>
+  <span class="sql-keyword">INNER JOIN</span> (<span class="sql-table">[IPD Admissions]</span>
+    <span class="sql-keyword">INNER JOIN</span> <span class="sql-table">[IPD Rates]</span> <span class="sql-keyword">ON</span> <span class="sql-table">[IPD Admissions]</span>.<span class="sql-field">[Ward ID]</span> = <span class="sql-table">[IPD Rates]</span>.<span class="sql-field">[Ward ID]</span>)
+  <span class="sql-keyword">ON</span> <span class="sql-table">[Patients Record]</span>.<span class="sql-field">[Patient ID]</span> = <span class="sql-table">[IPD Admissions]</span>.<span class="sql-field">[Patient ID]</span>;</pre>
+  </div>
+
+  <p>Look at what this query does compared to my Excel attempts. <strong>Age</strong> — instead of being typed in by hand and going out of date — is worked out from the patient's date of birth, every time the query runs. <strong>No# of days</strong> is worked out from the admission and discharge dates. And <strong>Total Amount</strong>, <strong>Discount Amount</strong>, and <strong>Net Amount</strong> — exactly the kind of values I was struggling to store on the "Patients Record" sheet in my Excel formula approach — are all calculated step by step, right here, from the IPD Admissions and IPD Rates tables.</p>
+
+  <p>This is the core difference: in Excel, I tried to hold <em>general patient information</em> and <em>bill calculations</em> in the same table, and ran into conflicts the moment a patient had more than one type of bill. In Access, "Patients Record" holds only the general, unchanging facts about a patient. Every bill — and every calculation based on that bill — is handled separately by a query like this one, built specifically for that purpose. A patient can have an IPD query result, an OPD query result, or both, with zero conflict, because neither one is competing for the same cell.</p>
+</section>
+
+<!-- COMPARISON -->
+<section class="section" id="comparison">
+  <p class="section-eyebrow">Side by Side</p>
+  <h2>Excel vs MS Access — What Each Tool Can Do</h2>
+  <p>Here's a clear comparison of every feature I needed for this project and how each tool handles it:</p>
+
+  <table class="comparison-table">
+    <tr>
+      <th>What I Needed</th>
+      <th>Microsoft Excel</th>
+      <th>Microsoft Access</th>
+    </tr>
+    <tr>
+      <td class="feature-col">Unique Patient IDs (no duplicates allowed)</td>
+      <td class="bad">✕ You can type the same ID twice — nothing warns you</td>
+      <td class="good">✓ Duplicate IDs are blocked automatically</td>
+    </tr>
+    <tr>
+      <td class="feature-col">Linking billing records to a real patient</td>
+      <td class="bad">✕ XLOOKUP copies the value but doesn't create a real link</td>
+      <td class="good">✓ Patient ID in billing is a real link — must match an existing patient</td>
+    </tr>
+    <tr>
+      <td class="feature-col">One patient, multiple visits</td>
+      <td class="bad">✕ Requires duplicating the patient's details in every row</td>
+      <td class="good">✓ Patient details stored once, all visits link back to them</td>
+    </tr>
+    <tr>
+      <td class="feature-col">Prevent "broken" records when a patient is deleted</td>
+      <td class="bad">✕ Deleting a patient leaves billing rows pointing to nobody</td>
+      <td class="good">✓ Access blocks deletion if billing records still exist, or removes them automatically</td>
+    </tr>
+    <tr>
+      <td class="feature-col">Enforcing the right data type (e.g. dates, numbers)</td>
+      <td class="bad">✕ You can type anything in any cell with no error</td>
+      <td class="good">✓ Each field has a type — entering the wrong type is rejected</td>
+    </tr>
+    <tr>
+      <td class="feature-col">Calculating bills automatically (days × daily rate)</td>
+      <td class="bad">✕ Formula chains break when any linked cell is empty (#VALUE!)</td>
+      <td class="good">✓ Calculated fields in queries always reflect current data</td>
+    </tr>
+    <tr>
+      <td class="feature-col">Querying across multiple tables</td>
+      <td class="bad">✕ XLOOKUP between sheets breaks on edge cases</td>
+      <td class="good">✓ SQL queries join tables correctly every time</td>
+    </tr>
+    <tr>
+      <td class="feature-col">Data entry forms (to avoid direct cell editing)</td>
+      <td class="bad">✕ No form layer — anyone can accidentally overwrite a formula</td>
+      <td class="good">✓ OPD Visits Form and IPD Admissions Form built in Access</td>
+    </tr>
+    <tr>
+      <td class="feature-col">Live reports (e.g. "show all unpaid bills")</td>
+      <td class="bad">✕ Requires manual filtering every time — not automatic</td>
+      <td class="good">✓ Saved queries update live: Unpaid IPD Bills, Unpaid OPD Bills</td>
+    </tr>
+  </table>
+
+  <div class="callout">
+    <strong>The key takeaway:</strong> Excel wasn't unsuccessful because I used it wrong or because my formulas weren't clever enough. It is unsuccessful because the features I needed — like unique IDs, real table connections, and data validation rules — don't exist in a spreadsheet. Those are database features, and you need a database tool to get them.
+  </div>
+</section>
+
+<!-- DATA OVERVIEW -->
+<section class="section" id="data">
+  <p class="section-eyebrow">What Was Built</p>
+  <h2>The Final Database — What's Inside</h2>
+  <p>The finished Access database manages 20 patients across both outpatient (OPD) and inpatient (IPD) care, with complete billing records and pricing tables:</p>
+
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:12px; margin:24px 0;">
+    <div style="background:var(--white); border:1px solid var(--rule); border-radius:10px; padding:16px; text-align:center;">
+      <div style="font-size:2rem; font-weight:700; color:var(--blue-border);">20</div>
+      <div style="font-size:12px; color:var(--ink-3);">Total Patients</div>
+    </div>
+    <div style="background:var(--white); border:1px solid var(--rule); border-radius:10px; padding:16px; text-align:center;">
+      <div style="font-size:2rem; font-weight:700; color:var(--success-border);">10</div>
+      <div style="font-size:12px; color:var(--ink-3);">Outpatient (OPD) Records</div>
+    </div>
+    <div style="background:var(--white); border:1px solid var(--rule); border-radius:10px; padding:16px; text-align:center;">
+      <div style="font-size:2rem; font-weight:700; color:var(--accent);">11</div>
+      <div style="font-size:12px; color:var(--ink-3);">Inpatient (IPD) Records</div>
+    </div>
+    <div style="background:var(--white); border:1px solid var(--rule); border-radius:10px; padding:16px; text-align:center;">
+      <div style="font-size:2rem; font-weight:700; color:#c08010;">5</div>
+      <div style="font-size:12px; color:var(--ink-3);">Ward Types with Rates</div>
+    </div>
+    <div style="background:var(--white); border:1px solid var(--rule); border-radius:10px; padding:16px; text-align:center;">
+      <div style="font-size:2rem; font-weight:700; color:#6b2fa0;">2</div>
+      <div style="font-size:12px; color:var(--ink-3);">Patients Who Moved OPD → IPD</div>
+    </div>
+  </div>
+
+  <p>The 5 ward types — General, Semi-Private, Private, ICU, and CCU — each have their own daily rate, room charge, nursing charge, doctor charge, and discount rate stored in the IPD Rates table. If a rate ever changes, you update it in one place and every bill recalculates automatically.</p>
+
+  <div class="callout-blue">
+    Two patients (P-008 and P-014) started as outpatients and were later admitted as inpatients. In Excel, this was written as a text note ("OPD → IPD Transition") and caused billing errors. In Access, each patient simply has one OPD record and one IPD record, both linked to the same patient — the database handles this naturally without any workarounds.
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Hospital DBMS — A Learning Project by <strong>Umair Asad</strong></p>
+  <p style="margin-top:8px; font-size:12px;">Built with Microsoft Excel (attempt) and Microsoft Access (solution)</p>
+</footer>
+
+</body>
+</html>
